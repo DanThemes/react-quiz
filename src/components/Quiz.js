@@ -28,7 +28,7 @@ const Quiz = ({category}) => {
   const fetchQuizzes = async () => {
     setIsLoading(true);
     try {
-      const { data: { results } } = await axios.get(`https://opentdb.com/api.php?amount=2&category=${category.id}`);
+      const { data: { results } } = await axios.get(`https://opentdb.com/api.php?amount=10&category=${category.id}`);
       setQuizData(results);
     } catch (e) {
       console.log(e, 1);
