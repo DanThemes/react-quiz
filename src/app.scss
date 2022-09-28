@@ -1,0 +1,36 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+* {
+  box-sizing: border-box;
+}
+
+a,
+a:visited,
+a:focus {
+  color: #000;
+  text-decoration: none;
+}
+
+#main-header {
+  background: #151515;
+  color: #aaa;
+  padding: 3rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  a {
+    color: #fff;
+  }
+  nav {
+    display: flex;
+    gap: 1rem;
+  }
+}
+
+.container {
+  width: 1200px;
+  max-width: 100%;
+  padding: 3rem 1rem;
+}
