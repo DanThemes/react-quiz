@@ -22,7 +22,8 @@ const displayAnswers = (quiz) => {
 const Quiz = () => {
   const [quizData, setQuizData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  // const [selectedAnswers, setSelectedAnswers] = useState(null);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const fetchQuizzes = async () => {
     setIsLoading(true);
@@ -35,19 +36,42 @@ const Quiz = () => {
     setIsLoading(false);
   }
 
+  const areAllFieldsCompleted = (quizData) => {
+    return quizData.filter(quiz => quiz.selected == undefined).length > 0 ? false : true;
+  }
+
   const handleSubmit = () => {
-  //   setSelectedAnswers(quizData.map(quiz => {
-  //       return { question: quiz.question, correct: quiz.correct_answer }
-  //   }));
-  //   console.log(selectedAnswers);
+    // check that all questions were answered
+    if (areAllFieldsCompleted(quizData)) {
+      const numberOfQuestions = quizData.length;
+      let correctAnswers = 0;
+
+      for (const quiz of quizData) {
+        if (quiz.correct_answer === quiz.selected) {
+          correctAnswers += 1;
+        }
+      }
+      
+      console.log(result)
+      setResult({total: numberOfQuestions, correct: correctAnswers});
+      setError(null);
+    } else {
+      setError('Please complete all the questions.');
+      setResult(null);
+    }
+    
+    console.log(quizData)
   }
 
   const handleAnswerSelect = e => {
-    quizData.map(quiz => {
-      if (quiz.question.replaceAll(' ', '-').trim().toLowerCase() == e.target.value) {
-        // add a "selected" property on the object
+    const newQuizData = quizData.map(quiz => {
+      if (quiz.question.replaceAll(' ', '-').trim().toLowerCase() == e.target.name) {
+        quiz.selected = e.target.value
       }
+      return quiz;
     })
+    setQuizData(newQuizData);
+    console.log(quizData)
   }
 
   useEffect(() => {
@@ -56,33 +80,62 @@ const Quiz = () => {
 
   return (
     <div>
-      {isLoading && <p>Loading...</p>}
-      {quizData && (
-        <div>
-          {quizData.map((quiz, idx) => {
-            return (
-              <div key={idx}>
-                <p>{quiz.question}</p>
-                <div className="answers">
-                  {displayAnswers(quiz).map(answer => {
-                    return (
-                      <div key={answer.id}>
-                        <label>
-                          <input onChange={handleAnswerSelect} type="radio" value={answer.answer} name={quiz.question.replaceAll(' ', '-').trim().toLowerCase()} />
-                          {answer.answer}
-                        </label>
-                      </div>
-                    )
-                  })}
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        quizData && (
+          <div>
+            {quizData.map((quiz, idx) => {
+              return (
+                <div key={idx}>
+                  <p>{quiz.question}</p>
+                  <div className="answers">
+                    {displayAnswers(quiz).map(answer => {
+                      return (
+                        <div 
+                          key={answer.id} 
+                          className={
+                            result && (
+                              answer.answer === quiz.selected && answer.answer === quiz.correct_answer ? 'correct' : (answer.answer === quiz.selected && answer.answer !== quiz.correct_answer) ? 'incorrect' : ''
+                            )
+                          }
+                        >
+                          <label>
+                            <input 
+                              onChange={handleAnswerSelect} 
+                              type="radio" 
+                              value={answer.answer} 
+                              name={quiz.question.replaceAll(' ', '-').trim().toLowerCase()} 
+                              required 
+                              checked={answer.answer === quiz.selected ? true : false}
+                            />
+                            {answer.answer}
+                          </label>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
+              )
+            })}
+
+            <button onClick={handleSubmit}>Submit</button>
+
+            {result && (
+              <div>
+                Your score: {result.correct} out of {result.total}
               </div>
-            )
-          })}
-          <button onClick={handleSubmit}>Submit</button>
-        </div>
-      )}
+            )}
+            {error && (
+              <div>
+                {error}
+              </div>
+            )}
+          </div>
+        ) 
+      ) }
     </div>
-  )
+    )
 }
 
 export default Quiz

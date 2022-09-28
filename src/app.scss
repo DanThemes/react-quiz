@@ -34,3 +34,14 @@ a:focus {
   max-width: 100%;
   padding: 3rem 1rem;
 }
+
+.answers {
+  .correct {
+    background-color: green;
+    color: #fff;
+  }
+  .incorrect {
+    background-color: red;
+    color:#fff;
+  }
+}
