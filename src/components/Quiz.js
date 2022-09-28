@@ -6,13 +6,13 @@ const displayAnswers = (quiz) => {
   const answers = [];
   answers.push({
     id: uuidv4(),
-    question: quiz.correct_answer,
+    answer: quiz.correct_answer,
     value: true
   });
   quiz.incorrect_answers.map(answer => {
     answers.push({
       id: uuidv4(),
-      question: answer,
+      answer: answer,
       value: true
     })
   });
@@ -22,7 +22,7 @@ const displayAnswers = (quiz) => {
 const Quiz = () => {
   const [quizData, setQuizData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedAnswers, setSelectedAnswers] = useState(null);
+  // const [selectedAnswers, setSelectedAnswers] = useState(null);
 
   const fetchQuizzes = async () => {
     setIsLoading(true);
@@ -36,16 +36,18 @@ const Quiz = () => {
   }
 
   const handleSubmit = () => {
-    setSelectedAnswers(() => {
-      quizData.map(quiz => {
-        return { question: quiz.question, correct: quiz.correct_answer }
-      })
-    })
-    console.log(selectedAnswers);
+  //   setSelectedAnswers(quizData.map(quiz => {
+  //       return { question: quiz.question, correct: quiz.correct_answer }
+  //   }));
+  //   console.log(selectedAnswers);
   }
 
-  const handleAnswerSelect = () => {
-    
+  const handleAnswerSelect = e => {
+    quizData.map(quiz => {
+      if (quiz.question.replaceAll(' ', '-').trim().toLowerCase() == e.target.value) {
+        // add a "selected" property on the object
+      }
+    })
   }
 
   useEffect(() => {
@@ -66,8 +68,8 @@ const Quiz = () => {
                     return (
                       <div key={answer.id}>
                         <label>
-                          <input onChange={handleAnswerSelect} type="radio" name={`question-${idx}`} />
-                          {answer.question}
+                          <input onChange={handleAnswerSelect} type="radio" value={answer.answer} name={quiz.question.replaceAll(' ', '-').trim().toLowerCase()} />
+                          {answer.answer}
                         </label>
                       </div>
                     )
