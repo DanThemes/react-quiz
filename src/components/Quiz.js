@@ -19,7 +19,7 @@ const displayAnswers = (quiz) => {
   return answers;
 }
 
-const Quiz = () => {
+const Quiz = ({category}) => {
   const [quizData, setQuizData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -28,12 +28,14 @@ const Quiz = () => {
   const fetchQuizzes = async () => {
     setIsLoading(true);
     try {
-      const { data: { results } } = await axios.get('https://opentdb.com/api.php?amount=2&category=22');
+      const { data: { results } } = await axios.get(`https://opentdb.com/api.php?amount=2&category=${category.id}`);
       setQuizData(results);
     } catch (e) {
-      console.log(e);
+      console.log(e, 1);
     }
     setIsLoading(false);
+    setResult(false);
+    setError(false);
   }
 
   const areAllFieldsCompleted = (quizData) => {
@@ -41,6 +43,8 @@ const Quiz = () => {
   }
 
   const handleSubmit = () => {
+    if (result) return;
+
     // check that all questions were answered
     if (areAllFieldsCompleted(quizData)) {
       const numberOfQuestions = quizData.length;
@@ -64,6 +68,8 @@ const Quiz = () => {
   }
 
   const handleAnswerSelect = e => {
+    if (result) return;
+
     const newQuizData = quizData.map(quiz => {
       if (quiz.question.replaceAll(' ', '-').trim().toLowerCase() == e.target.name) {
         quiz.selected = e.target.value
@@ -85,6 +91,7 @@ const Quiz = () => {
       ) : (
         quizData && (
           <div>
+            <h1>{category.name}</h1>
             {quizData.map((quiz, idx) => {
               return (
                 <div key={idx}>
@@ -95,9 +102,11 @@ const Quiz = () => {
                         <div 
                           key={answer.id} 
                           className={
-                            result && (
-                              answer.answer === quiz.selected && answer.answer === quiz.correct_answer ? 'correct' : (answer.answer === quiz.selected && answer.answer !== quiz.correct_answer) ? 'incorrect' : ''
-                            )
+                              result && answer.answer === quiz.selected && answer.answer === quiz.correct_answer ? 
+                                'correct' : 
+                                (result && answer.answer === quiz.selected && answer.answer !== quiz.correct_answer) ? 
+                                'incorrect' 
+                                : ''
                           }
                         >
                           <label>
@@ -119,7 +128,7 @@ const Quiz = () => {
               )
             })}
 
-            <button onClick={handleSubmit}>Submit</button>
+            <button onClick={handleSubmit} disabled={result ? true : false}>Submit</button>
 
             {result && (
               <div>
